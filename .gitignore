@@ -107,3 +107,7 @@ logs
 # Test files
 test-results/
 coverage/
+.vercel
+
+# Local Netlify folder
+.netlify

@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: vetbot-api
+    env: node
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: vetbot-db
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://cozy-buttercream-d55176.netlify.app
+
+databases:
+  - name: vetbot-db
+    databaseName: vet-chatbot
+    user: vetbot
