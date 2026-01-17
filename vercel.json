@@ -1,0 +1,28 @@
+{
+  "name": "veterinary-chatbot-sdk",
+  "version": 2,
+  "builds": [
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "http://localhost:5001/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/$1"
+    }
+  ],
+  "env": {
+    "REACT_APP_API_URL": "https://your-api-domain.com/api",
+    "REACT_APP_CHATBOT_TITLE": "Veterinary Assistant",
+    "REACT_APP_ENVIRONMENT": "production"
+  }
+}

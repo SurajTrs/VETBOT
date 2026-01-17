@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: vet-chatbot-db
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: vet-chatbot
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - vet-chatbot-network
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: vet-chatbot-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017/vet-chatbot?authSource=admin
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: http://localhost:3000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    volumes:
+      - ./public:/app/public
+    networks:
+      - vet-chatbot-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: vet-chatbot-client
+    restart: unless-stopped
+    environment:
+      REACT_APP_API_URL: http://localhost:5000/api
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    networks:
+      - vet-chatbot-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  vet-chatbot-network:
+    driver: bridge
